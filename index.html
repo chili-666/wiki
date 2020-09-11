@@ -157,6 +157,8 @@ Error message and password prompt
 
 <li>$:/isEncrypted</li>
 
+<li>$:/plugins/tiddlywiki/classictools</li>
+
 <li>$:/state/tab--219645345</li>
 
 <li>$:/state/tab--86143343</li>
@@ -9803,14 +9805,46 @@ Error message and password prompt
 <div title="$:/isEncrypted">
 <pre>no</pre>
 </div>
-<div created="20200911125201513" modified="20200911125201513" title="$:/state/tab--219645345">
-<pre>$:/core/ui/ControlPanel/Plugins/Add/Themes</pre>
+<div dependents="" description="TiddlyWiki Classic tools" list="readme" name="Classic Tools" plugin-type="plugin" title="$:/plugins/tiddlywiki/classictools" type="application/json" version="5.1.22">
+<pre>{
+    &quot;tiddlers&quot;: {
+        &quot;$:/plugins/tiddlywiki/classictools/recipe.js&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/classictools/recipe.js&quot;,
+            &quot;text&quot;: &quot;/*\\\ntitle: $:/plugins/tiddlywiki/classictools/recipe.js\ntype: application/javascript\nmodule-type: tiddlerdeserializer\n\nModule to deserialize tiddlers from an old school TiddlyWiki recipe file.\n\nThe idea is to process the recipe file recursively, loading tiddlers into the main store using synchronous file operations. The tiddlers have their titles prefixed with the associated marker in curly brackets (\&quot;{shadow}\&quot;, \&quot;{tiddler}\&quot; etc).\n\n\\*/\n(function(){\n\n/*jslint node: true, browser: true */\n/*global $tw: false */\n\&quot;use strict\&quot;;\n\nexports[\&quot;text/vnd.tiddlywiki2-recipe\&quot;] = function(text,fields) {\n\tvar self = this,\n\t\tpath = require(\&quot;path\&quot;),\n\t\tfs = require(\&quot;fs\&quot;),\n\t\ttiddlers = [],\n\t\tparseRecipe = function(text) {\n\t\t\tvar recipe = [];\n\t\t\ttext.toString().split(/\\r?\\n/mg).forEach(function(line) {\n\t\t\t\t// Check if the line is a comment\n\t\t\t\tif(line.charAt(0) !== \&quot;#\&quot;) {\n\t\t\t\t\t// Find the colon splitting the name from the value\n\t\t\t\t\tvar p = line.indexOf(\&quot;:\&quot;);\n\t\t\t\t\tif(p !== -1) {\n\t\t\t\t\t\trecipe.push({\n\t\t\t\t\t\t\tname: line.substr(0,p).trim(),\n\t\t\t\t\t\t\tvalue: line.substr(p+1).trim()\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\t\t\treturn recipe;\n\t\t},\n\t\tloadTiddlersFromFile = function(sourcePath,prefix) {\n\t\t\tvar ext = path.extname(sourcePath),\n\t\t\t\textensionInfo = $tw.utils.getFileExtensionInfo(ext),\n\t\t\t\ttypeInfo = extensionInfo ? $tw.config.contentTypeInfo[extensionInfo.type] : null,\n\t\t\t\tdata = fs.readFileSync(sourcePath,typeInfo ? typeInfo.encoding : \&quot;utf8\&quot;),\n\t\t\t\tfields = {title: sourcePath},\n\t\t\t\ttids = self.deserializeTiddlers(ext,data,fields),\n\t\t\t\tmetafile = sourcePath + \&quot;.meta\&quot;;\n\t\t\tif(ext !== \&quot;.json\&quot; &amp;&amp; tids.length === 1 &amp;&amp; fs.existsSync(metafile)) {\n\t\t\t\tvar metadata = fs.readFileSync(metafile,\&quot;utf8\&quot;);\n\t\t\t\tif(metadata) {\n\t\t\t\t\ttids = [$tw.utils.parseFields(metadata,tids[0])];\n\t\t\t\t}\n\t\t\t}\n\t\t\ttids.forEach(function(tid) {\n\t\t\t\ttid.title = prefix + tid.title;\n\t\t\t});\n\t\t\ttiddlers.push.apply(tiddlers,tids);\n\t\t},\n\t\tprocessRecipe = function(sourcePath,text) {\n\t\t\tvar recipe = parseRecipe(text);\n\t\t\tfor(var t=0; t&lt;recipe.length; t++) {\n\t\t\t\tif(recipe[t].name === \&quot;recipe\&quot;) {\n\t\t\t\t\tvar recipeFile = path.resolve(path.dirname(sourcePath),recipe[t].value);\n\t\t\t\t\tprocessRecipe(recipeFile,fs.readFileSync(recipeFile,\&quot;utf8\&quot;));\n\t\t\t\t} else {\n\t\t\t\t\tvar tiddlerFile = path.resolve(path.dirname(sourcePath),recipe[t].value);\n\t\t\t\t\tloadTiddlersFromFile(tiddlerFile,\&quot;{\&quot; + recipe[t].name + \&quot;}\&quot;);\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\tsourcePath = fields.title; // Bit of a hack to take advantage of the default title being the path to the tiddler file\n\tprocessRecipe(sourcePath,text);\n\treturn tiddlers;\n};\n\n})();\n&quot;,
+            &quot;type&quot;: &quot;application/javascript&quot;,
+            &quot;module-type&quot;: &quot;tiddlerdeserializer&quot;
+        },
+        &quot;$:/plugins/tiddlywiki/classictools/readme&quot;: {
+            &quot;title&quot;: &quot;$:/plugins/tiddlywiki/classictools/readme&quot;,
+            &quot;text&quot;: &quot;This plugin provides facilities for working with TiddlyWiki Classic. It is used in the build process for TiddlyWiki Classic.\n\nThe additional features are:\n\n* A ''tiddlerdeserializer'' module for reading TiddlyWiki Classic `.recipe` files\n* Templates for building TiddlyWiki Classic.\n\nSee https://github.com/TiddlyWiki/tiddlywiki.com for more details.\n\n[[Source code|https://github.com/Jermolene/TiddlyWiki5/blob/master/plugins/tiddlywiki/classictools]]\n&quot;
+        },
+        &quot;$:/core/templates/html-div-tiddler-remove-prefix&quot;: {
+            &quot;title&quot;: &quot;$:/core/templates/html-div-tiddler-remove-prefix&quot;,
+            &quot;text&quot;: &quot;&lt;!--\n\nThis template is used for saving tiddlers as an HTML DIV tag with attributes representing the tiddler fields.\n\n--&gt;`&lt;div`&lt;$fields template=' $name$=\&quot;$encoded_value$\&quot;' stripTitlePrefix=\&quot;yes\&quot;&gt;&lt;/$fields&gt;`&gt;\n&lt;pre&gt;`&lt;$view field=\&quot;text\&quot; format=\&quot;htmlencoded\&quot; /&gt;`&lt;/pre&gt;\n&lt;/div&gt;`\n&quot;
+        },
+        &quot;$:/core/templates/plain-text-tiddler-strip-comments&quot;: {
+            &quot;title&quot;: &quot;$:/core/templates/plain-text-tiddler-strip-comments&quot;,
+            &quot;text&quot;: &quot;&lt;$view field=\&quot;text\&quot; format=\&quot;stripcomments\&quot; /&gt;&quot;
+        },
+        &quot;$:/core/templates/tiddlywiki2.externaljs.template.html&quot;: {
+            &quot;title&quot;: &quot;$:/core/templates/tiddlywiki2.externaljs.template.html&quot;,
+            &quot;text&quot;: &quot;{{{ [prefix[{prejs}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n{{{ [prefix[{js}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n{{{ [prefix[{postjs}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n{{{ [prefix[{jsext}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n\n&quot;
+        },
+        &quot;$:/core/templates/tiddlywiki2.template.html&quot;: {
+            &quot;title&quot;: &quot;$:/core/templates/tiddlywiki2.template.html&quot;,
+            &quot;text&quot;: &quot;\\rules only filteredtranscludeinline transcludeinline\n&lt;!DOCTYPE html PUBLIC \&quot;-//W3C//DTD XHTML 1.0 Strict//EN\&quot; \&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\&quot;&gt;\n&lt;html xmlns=\&quot;http://www.w3.org/1999/xhtml\&quot; xml:lang=\&quot;en\&quot; lang=\&quot;en\&quot;&gt;\n&lt;head&gt;\n&lt;script id=\&quot;versionArea\&quot; type=\&quot;text/javascript\&quot;&gt;\n//&lt;![CDATA[\n{{{ [prefix[{version}]] ||$:/core/templates/plain-text-tiddler}}}\n//]]&gt;\n&lt;/script&gt;\n&lt;meta http-equiv=\&quot;Content-Type\&quot; content=\&quot;text/html;charset=utf-8\&quot; /&gt;\n&lt;meta name=\&quot;copyright\&quot; content=\&quot;\n{{{ [prefix[{copyright}]] ||$:/core/templates/plain-text-tiddler}}}\n\&quot; /&gt;\n&lt;!--PRE-HEAD-START--&gt;\n{{{ [prefix[{prehead}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;!--PRE-HEAD-END--&gt;\n&lt;title&gt;\n{{{ [prefix[{title}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;/title&gt;\n&lt;style id=\&quot;styleArea\&quot; type=\&quot;text/css\&quot;&gt;\n{{{ [prefix[{style}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;/style&gt;\n&lt;!--POST-HEAD-START--&gt;\n{{{ [prefix[{posthead}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;!--POST-HEAD-END--&gt;\n&lt;/head&gt;\n&lt;body onload=\&quot;main();\&quot; onunload=\&quot;if(window.unload) unload();\&quot;&gt;\n&lt;!--PRE-BODY-START--&gt;\n{{{ [prefix[{prebody}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;!--PRE-BODY-END--&gt;\n&lt;div id=\&quot;copyright\&quot;&gt;\nWelcome to TiddlyWiki created by Jeremy Ruston; Copyright &amp;copy; 2004-2007 Jeremy Ruston, Copyright &amp;copy; 2007-2011 UnaMesa Association\n&lt;/div&gt;\n&lt;noscript&gt;\n{{{ [prefix[{noscript}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;/noscript&gt;\n&lt;div id=\&quot;saveTest\&quot;&gt;&lt;/div&gt;\n&lt;div id=\&quot;backstageCloak\&quot;&gt;&lt;/div&gt;\n&lt;div id=\&quot;backstageButton\&quot;&gt;&lt;/div&gt;\n&lt;div id=\&quot;backstageArea\&quot;&gt;&lt;div id=\&quot;backstageToolbar\&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n&lt;div id=\&quot;backstage\&quot;&gt;\n\t&lt;div id=\&quot;backstagePanel\&quot;&gt;&lt;/div&gt;\n&lt;/div&gt;\n&lt;div id=\&quot;contentWrapper\&quot;&gt;&lt;/div&gt;\n&lt;div id=\&quot;contentStash\&quot;&gt;&lt;/div&gt;\n&lt;div id=\&quot;shadowArea\&quot;&gt;\n{{{ [prefix[{shadow}]] +[sortcs[title]] ||$:/core/templates/html-div-tiddler-remove-prefix}}}\n&lt;/div&gt;\n&lt;!--POST-SHADOWAREA--&gt;\n&lt;div id=\&quot;storeArea\&quot;&gt;\n{{{ [prefix[{tiddler}]] +[sortcs[title]] ||$:/core/templates/html-div-tiddler-remove-prefix}}}\n{{{ [prefix[{plugin}]] ||$:/core/templates/plain-text-tiddler}}}\n{{{ [prefix[{posttiddlers}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;/div&gt;\n&lt;!--POST-STOREAREA--&gt;\n&lt;!--POST-BODY-START--&gt;\n{{{ [prefix[{postbody}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;!--POST-BODY-END--&gt;\n&lt;script id=\&quot;jsArea\&quot; type=\&quot;text/javascript\&quot;&gt;\n//&lt;![CDATA[\n{{{ [prefix[{prejs}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n{{{ [prefix[{js}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n{{{ [prefix[{postjs}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n//]]&gt;\n&lt;/script&gt;\n{{{ [prefix[{jsext}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n&lt;script id=\&quot;jsdeprecatedArea\&quot; type=\&quot;text/javascript\&quot;&gt;\n//&lt;![CDATA[\n{{{ [prefix[{jsdeprecated}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n//]]&gt;\n&lt;/script&gt;\n&lt;script id=\&quot;jslibArea\&quot; type=\&quot;text/javascript\&quot;&gt;\n//&lt;![CDATA[\n{{{ [prefix[{jslib}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n//]]&gt;\n&lt;/script&gt;\n&lt;script id=\&quot;jqueryArea\&quot; type=\&quot;text/javascript\&quot;&gt;\n//&lt;![CDATA[\n{{{ [prefix[{jquery}]] ||$:/core/templates/plain-text-tiddler-strip-comments}}}\n//]]&gt;\n&lt;/script&gt;\n&lt;script type=\&quot;text/javascript\&quot;&gt;\n//&lt;![CDATA[\nif(useJavaSaver)\n\tdocument.write(\&quot;&lt;applet style='position:absolute;left:-1px' name='TiddlySaver' code='TiddlySaver.class' archive='TiddlySaver.jar' width='1' height='1'&gt;&lt;/applet&gt;\&quot;);\n//]]&gt;\n&lt;/script&gt;\n&lt;!--POST-SCRIPT-START--&gt;\n{{{ [prefix[{postscript}]] ||$:/core/templates/plain-text-tiddler}}}\n&lt;!--POST-SCRIPT-END--&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n&quot;
+        }
+    }
+}</pre>
+</div>
+<div created="20200911125201513" modified="20200911125931329" title="$:/state/tab--219645345">
+<pre>$:/core/ui/ControlPanel/Plugins/Add/Plugins</pre>
 </div>
 <div created="20200911125210984" modified="20200911125210984" title="$:/state/tab--86143343">
 <pre>$:/core/ui/ControlPanel/Plugins/Installed/Themes</pre>
 </div>
-<div created="20200911121049672" modified="20200911125242585" title="$:/state/tab-1749438307">
-<pre>$:/core/ui/ControlPanel/Appearance</pre>
+<div created="20200911121049672" modified="20200911125926153" title="$:/state/tab-1749438307">
+<pre>$:/core/ui/ControlPanel/Plugins</pre>
 </div>
 <div created="20200911121051240" modified="20200911123406885" title="$:/state/tab-2065006209">
 <pre>$:/core/ui/ControlPanel/Saving/General</pre>
@@ -9819,7 +9853,7 @@ Error message and password prompt
 <pre>$:/core/ui/SideBar/Recent</pre>
 </div>
 <div title="$:/status/RequireReloadDueToPluginChange">
-<pre>no</pre>
+<pre>yes</pre>
 </div>
 <div created="20200911125148170" list="GettingStarted $:/ControlPanel" modified="20200911125212609" title="$:/StoryList">
 <pre></pre>
