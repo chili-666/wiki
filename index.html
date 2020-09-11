@@ -169,6 +169,8 @@ Error message and password prompt
 
 <li>$:/temp/info-plugin</li>
 
+<li>$:/temp/NewTagName</li>
+
 <li>$:/temp/search</li>
 
 <li>$:/themes/tiddlywiki/snowwhite</li>
@@ -178,6 +180,8 @@ Error message and password prompt
 <li>Blahblah</li>
 
 <li>Geändert und nochmal</li>
+
+<li>Icon zu Page hinzufügen</li>
 
 <li>STRG RELOAD???</li>
 
@@ -9601,7 +9605,7 @@ Error message and password prompt
 <div title="$:/status/RequireReloadDueToPluginChange">
 <pre>no</pre>
 </div>
-<div created="20200911123609486" list="[[STRG RELOAD???]] GettingStarted" modified="20200911123609486" title="$:/StoryList">
+<div created="20200911124121486" list="[[Icon zu Page hinzufügen]] GettingStarted $:/ControlPanel" modified="20200911124121486" title="$:/StoryList">
 <pre></pre>
 </div>
 <div plugin-type="info" title="$:/temp/info-plugin" type="application/json">
@@ -9661,6 +9665,9 @@ Error message and password prompt
         }
     }
 }</pre>
+</div>
+<div created="20200911124052774" modified="20200911124113318" title="$:/temp/NewTagName">
+<pre></pre>
 </div>
 <div created="20200911122051781" modified="20200911122129461" title="$:/temp/search">
 <pre></pre>
@@ -9779,6 +9786,89 @@ Error message and password prompt
 </div>
 <div created="20200911122024260" modified="20200911123446974" tags="" title="Geändert und nochmal">
 <pre></pre>
+</div>
+<div created="20200911123721320" modified="20200911124613648" tags="wordpress box media-uploader" title="Icon zu Page hinzufügen">
+<pre>/**
+ * Icon zu Pages hinzufügen
+ */
+
+add_action('init', 'init_pageIcon');
+function init_pageIcon()
+{
+	add_action('admin_menu', 'add_boxes');
+}
+
+
+function add_boxes()
+{
+	//Change post/page as needed
+	add_meta_box('pageIcon_id', 'Icon auswählen', 'pageIcon', 'page', 'normal', 'high');
+}
+
+function pageIcon($post)
+{	
+	// Retrieve current state 
+	$iconValue = get_post_meta( $post-&gt;ID, 'pageIcon',  true  );
+	//print_r($headerChecked);
+	?&gt;
+			&lt;div style=&quot;
+						display:flex; 
+						flex-flow: row nowrap; 
+						justify-content:space-evenly;&quot;&gt;
+
+					&lt;div class=&quot;iconInput&quot;&gt;
+						&lt;input type=&quot;text&quot; name=&quot;pageIcon&quot; id=&quot;pageIcon&quot; value=&lt;?php echo $iconValue; ?&gt;&gt;&lt;br/&gt;&lt;br/&gt;
+						&lt;input type=&quot;button&quot; id=&quot;upload_image_btn&quot; class=&quot;button&quot; value=&quot;Icon auswählen&quot; /&gt;
+					&lt;/div&gt;
+					
+					&lt;img src=&quot;&lt;?php echo $iconValue; ?&gt;&quot; height=&quot;100px&quot; width=&quot;100px&quot;&gt;
+			&lt;/div&gt;
+	&lt;?php
+
+	// jQuery
+wp_enqueue_script('jquery');
+// This will enqueue the Media Uploader script
+wp_enqueue_media();
+
+//Media Uploader starten
+?&gt;
+ &lt;script type=&quot;text/javascript&quot;&gt;
+jQuery(document).ready(function($){
+	console.log(&quot;JQUERY&quot;);
+    $('#upload_image_btn').click(function(e) {
+        e.preventDefault();
+        var image = wp.media({ 
+            title: 'Upload Image',
+            // mutiple: true wenn viele Dateien auf einmal hoch geladen werden sollen
+            multiple: false
+        }).open()
+        .on('select', function(e){
+            // Das ausgewählte Bild als Objekt vom Uploader holen
+            var uploaded_image = image.state().get('selection').first();
+            // Gewähltes Bild zu JSOn konvertieren -&gt; einfacherer Zugriff
+            console.log(uploaded_image);
+            var image_url = uploaded_image.toJSON().url;
+            // Eingabefeldvariable anpassen
+            $('#pageIcon').val(image_url);
+        });
+    });
+});
+&lt;/script&gt;
+&lt;?php
+}
+
+function save_pageIcon( $post_id ) {
+	
+	// verify nonce
+//	if ( !isset( $_POST[''] ) ) 
+//	$_POST['headerCheckbox'] = 1;
+	
+	if ( isset( $_POST['pageIcon'] ) ) 
+		update_post_meta( $post_id, 'pageIcon',$_POST['pageIcon']);
+
+}
+
+add_action( 'save_post', 'save_pageIcon' );	</pre>
 </div>
 <div created="20200911121141577" modified="20200911123619462" tags="" title="STRG RELOAD???">
 <pre></pre>
